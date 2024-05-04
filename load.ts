@@ -1,5 +1,4 @@
 import Result, { Failure } from "@nihility-io/result"
-import * as fs from "@std/fs"
 import * as YAML from "@std/yaml"
 import { Metadata, parseDefinition, TranslationDefinition } from "./models.ts"
 import Record from "@nihility-io/record"
@@ -27,6 +26,8 @@ export const loadFiles = async (
 	baseLanguage: string,
 	translationsFolder: URL,
 ): Promise<[Record<string, Record<string, string>>, Record<string, Metadata>]> => {
+	const fs = await import("@std/fs")
+
 	// Loop through all translation files
 	const definitions: Record<string, TranslationDefinition> = {}
 	for await (const f of fs.walk(translationsFolder, { maxDepth: 1, includeDirs: false, exts: [".yaml", ".yml"] })) {

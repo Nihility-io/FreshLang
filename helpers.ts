@@ -7,7 +7,7 @@ import { useCookie } from "@nihility-io/use-cookie"
  * @example
  * formatString("Hello, {{name}}!", { name: "John Smith" }) // => "Hello, John Smith!"
  */
-export const formatString = (template: string, params: Record<string, string>) => {
+export const formatString = (template: string, params: Record<string, string>): string => {
 	let res = ""
 	let v = ""
 	let brackets = 0

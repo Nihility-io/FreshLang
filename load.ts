@@ -1,7 +1,7 @@
 import Result, { Failure } from "@nihility-io/result"
 import * as fs from "@std/fs"
 import * as YAML from "@std/yaml"
-import { Metadata, TranslationDefinition } from "./models.ts"
+import { Metadata, parseDefinition, TranslationDefinition } from "./models.ts"
 import Record from "@nihility-io/record"
 
 /**
@@ -15,13 +15,7 @@ const loadFile = async (file: string): Promise<Result<TranslationDefinition>> =>
 		return data as Failure<TranslationDefinition>
 	}
 
-	// Parse data using Zod
-	const res = await TranslationDefinition.safeParseAsync(data.value)
-	if (!res.success) {
-		return Result.failure<TranslationDefinition>(res.error)
-	}
-
-	return Result.success<TranslationDefinition>(res.data)
+	return parseDefinition(data.value)
 }
 
 /**

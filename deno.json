@@ -25,7 +25,12 @@
 	},
 	"compilerOptions": {
 		"lib": [
-			"deno.window"
+			"esnext",
+			"dom",
+			"deno.ns",
+			"deno.shared_globals",
+			"deno.webstorage",
+			"deno.cache"
 		]
 	},
 	"fmt": {

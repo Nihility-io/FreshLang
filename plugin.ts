@@ -25,24 +25,34 @@ interface Plugin {
 }
 
 export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
+	let isLanguageSupported = (_s: string): boolean => false
+
 	const supportedLanguages: string[] = []
 	;(async () => {
-		const [translations, metadata] = await loadFiles(
-			cfg.baseLanguage ?? "en",
-			new URL(meta.resolve(`./${cfg.source ?? "translations"}`)),
-		)
-		supportedLanguages.push(...Object.keys(translations))
+		if (Deno.mainModule.endsWith("dev.ts")) {
+			const [translations, metadata] = await loadFiles(
+				cfg.baseLanguage ?? "en",
+				new URL(meta.resolve(`./${cfg.source ?? "translations"}`)),
+			)
+			supportedLanguages.push(...Object.keys(translations))
 
-		const script = generate(
-			cfg.importName ?? "@nihility-io/fresh-lang",
-			cfg.baseLanguage ?? "en",
-			metadata,
-			translations,
-		)
+			const script = generate(
+				cfg.importName ?? "@nihility-io/fresh-lang",
+				cfg.baseLanguage ?? "en",
+				metadata,
+				translations,
+			)
 
-		await Deno.writeTextFile(new URL(meta.resolve(`./${cfg.source ?? "translations"}/translations.gen.ts`)), script)
+			await Deno.writeTextFile(
+				new URL(meta.resolve(`./${cfg.source ?? "translations"}/translations.gen.ts`)),
+				script,
+			)
+		}
+		const res = await import(
+			meta.resolve(`./${cfg.source ?? "translations"}/translations.gen.ts`)
+		) as { isLanguageSupported: (s: string) => boolean }
+		isLanguageSupported = res.isLanguageSupported
 	})()
-
 	const getCookies = import("@std/http").then((x) => x.getCookies)
 
 	return {
@@ -67,7 +77,7 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 							})
 							.sort(([q1], [q2]) => q2 - q1)
 							.flatMap(([_, locale]) => locale === "*" ? [] : locale)
-							.find((x) => supportedLanguages.includes(x))
+							.find(isLanguageSupported)
 
 						ctx.state.lang = headerLang ?? cfg.baseLanguage
 

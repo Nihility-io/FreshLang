@@ -1,5 +1,6 @@
 import Record from "@nihility-io/record"
 import { generate } from "./generate.ts"
+import { getCookies } from "./helpers.ts"
 import { loadFiles } from "./load.ts"
 import { Metadata } from "./models.ts"
 
@@ -65,7 +66,6 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 			console.log(e)
 		}
 	})()
-	const getCookies = import("@std/http").then((x) => x.getCookies)
 
 	return {
 		name: "@nihility-io/lang",
@@ -74,7 +74,7 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 				path: "/",
 				middleware: {
 					handler: async (req: Request, ctx: Context) => {
-						const cookieLang = (await getCookies)(req.headers)["lang"]
+						const cookieLang = getCookies(req.headers)["lang"]
 						if (cookieLang) {
 							ctx.state.lang = cookieLang
 						}

@@ -7,7 +7,7 @@ import Record from "@nihility-io/record"
  * Reads and parses a translation YAML file
  * @param path Path to the translation YAML
  */
-const loadFile = async (file: string): Promise<Result<TranslationDefinition>> => {
+const loadFile = async (file: URL | string): Promise<Result<TranslationDefinition>> => {
 	// Load and parse YAML
 	const data = await Result.fromPromise(Deno.readTextFile(file).then(YAML.parse))
 	if (!data.isSuccess()) {
@@ -26,12 +26,14 @@ export const loadFiles = async (
 	baseLanguage: string,
 	translationsFolder: URL,
 ): Promise<[Record<string, Record<string, string>>, Record<string, Metadata>]> => {
-	const fs = await import("@std/fs")
-
 	// Loop through all translation files
 	const definitions: Record<string, TranslationDefinition> = {}
-	for await (const f of fs.walk(translationsFolder, { maxDepth: 1, includeDirs: false, exts: [".yaml", ".yml"] })) {
-		const tf = await loadFile(f.path)
+
+	for await (const f of Deno.readDir(translationsFolder)) {
+		if (!f.isFile || (!f.name.endsWith(".yaml") && !f.name.endsWith(".yml"))) {
+			continue
+		}
+		const tf = await loadFile(new URL(translationsFolder + "/" + f.name))
 		if (!tf.isSuccess()) {
 			console.error((tf as Failure<unknown>).error)
 			continue

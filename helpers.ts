@@ -84,3 +84,26 @@ export const helperUseLanguage = <Language extends string>(
 	initialLanguage: Language,
 ): [Language, (v: Language) => void] =>
 	(typeof document !== "undefined") ? useCookie("lang", initialLanguage) : [initialLanguage, () => {}]
+
+/**
+ * Parse cookies of a header
+ * @param headers The headers instance to get cookies from
+ * @return Object with cookie names as keys
+ */
+export function getCookies(headers: Headers): Record<string, string> {
+	const cookie = headers.get("Cookie")
+	if (cookie === null) {
+		return {}
+	}
+
+	const res: Record<string, string> = {}
+	for (const kv of cookie.split(";")) {
+		const [cookieKey, ...cookieVal] = kv.split("=")
+		if (cookieKey === undefined) {
+			return {}
+		}
+		res[cookieKey.trim()] = cookieVal.join("=")
+	}
+
+	return res
+}

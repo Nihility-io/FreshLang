@@ -1,4 +1,3 @@
-import { getCookies } from "@std/http"
 import { generate } from "./generate.ts"
 import { loadFiles } from "./load.ts"
 
@@ -44,6 +43,8 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 		await Deno.writeTextFile(new URL(meta.resolve(`./${cfg.source ?? "translations"}/translations.gen.ts`)), script)
 	})()
 
+	const getCookies = import("@std/http").then((x) => x.getCookies)
+
 	return {
 		name: "@nihility-io/lang",
 		middlewares: [
@@ -51,7 +52,7 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 				path: "/",
 				middleware: {
 					handler: async (req: Request, ctx: Context) => {
-						const cookieLang = getCookies(req.headers)["lang"]
+						const cookieLang = (await getCookies)(req.headers)["lang"]
 						if (cookieLang) {
 							ctx.state.lang = cookieLang
 						}

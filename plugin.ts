@@ -1,11 +1,12 @@
+import Record from "@nihility-io/record"
 import { generate } from "./generate.ts"
 import { loadFiles } from "./load.ts"
+import { Metadata } from "./models.ts"
 
 export interface Config {
 	source?: string
 	baseLanguage?: string
 	importName?: string
-	debug?: boolean
 }
 
 interface Context {
@@ -26,20 +27,13 @@ interface Plugin {
 }
 
 export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
-	const debug = (...args: any[]) => {
-		if (cfg.debug) {
-			console.log("[FreshLang DEBUG]", ...args)
-		}
-	}
+	let langMetadata: Record<string, Metadata> = {}
 
-	debug("Starting ...")
-
-	let isLanguageSupported = (_s: string): boolean => false
+	const isLanguageSupported = (s: string): boolean => Record.keys(langMetadata).includes(s)
 
 	const supportedLanguages: string[] = []
 	;(async () => {
 		if (Deno.mainModule.endsWith("dev.ts")) {
-			debug("Running in Dev mode.")
 			const [translations, metadata] = await loadFiles(
 				cfg.baseLanguage ?? "en",
 				new URL(meta.resolve(`./${cfg.source ?? "translations"}`)),
@@ -54,18 +48,21 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 			)
 
 			await Deno.writeTextFile(
-				new URL(meta.resolve(`./${cfg.source ?? "translations"}/translations.gen.ts`)),
+				new URL(meta.resolve("./fresh-lang.gen.json")),
+				JSON.stringify(metadata, null, 2),
+			)
+
+			await Deno.writeTextFile(
+				new URL(meta.resolve("./fresh-lang.gen.ts")),
 				script,
 			)
 		}
 		try {
-			debug("Import translations")
-			const res = await import(
-				meta.resolve(`./${cfg.source ?? "translations"}/translations.gen.ts`)
-			) as { isLanguageSupported: (s: string) => boolean }
-			isLanguageSupported = res.isLanguageSupported
+			langMetadata = await Deno.readTextFile(
+				new URL(meta.resolve("./fresh-lang.gen.json")),
+			).then(JSON.parse)
 		} catch (e) {
-			debug(e)
+			console.log(e)
 		}
 	})()
 	const getCookies = import("@std/http").then((x) => x.getCookies)
@@ -77,12 +74,6 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 				path: "/",
 				middleware: {
 					handler: async (req: Request, ctx: Context) => {
-						debug(
-							"Cookie:",
-							(await getCookies)(req.headers)["lang"],
-							"Accept:",
-							req.headers.get("Accept-Language"),
-						)
 						const cookieLang = (await getCookies)(req.headers)["lang"]
 						if (cookieLang) {
 							ctx.state.lang = cookieLang

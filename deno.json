@@ -23,6 +23,11 @@
 			]
 		}
 	},
+	"compilerOptions": {
+		"lib": [
+			"deno.window"
+		]
+	},
 	"fmt": {
 		"useTabs": true,
 		"lineWidth": 120,

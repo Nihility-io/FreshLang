@@ -1,6 +1,6 @@
 {
 	"name": "@nihility-io/fresh-lang",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"exports": "./mod.ts",
 	"lock": true,
 	"tasks": {
@@ -8,8 +8,8 @@
 	},
 	"imports": {
 		"@nihility-io/record": "jsr:@nihility-io/record@^0.1.1",
-		"@nihility-io/result": "jsr:@nihility-io/result@^0.1.2",
-		"@nihility-io/use-cookie": "jsr:@nihility-io/use-cookie@^0.1.3",
+		"@nihility-io/result": "jsr:@nihility-io/result@^0.1.3",
+		"@nihility-io/use-cookie": "jsr:@nihility-io/use-cookie@^0.1.4",
 		"@std/yaml": "jsr:@std/yaml@^0.224.0",
 		"zod": "npm:zod@^3.23.6"
 	},

@@ -75,8 +75,9 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 				middleware: {
 					handler: async (req: Request, ctx: Context) => {
 						const cookieLang = getCookies(req.headers)["lang"]
-						if (cookieLang) {
+						if (cookieLang && isLanguageSupported(cookieLang)) {
 							ctx.state.lang = cookieLang
+							return await ctx.next()
 						}
 
 						const headerLang = (req.headers.get("Accept-Language") ?? "")

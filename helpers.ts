@@ -58,17 +58,17 @@ export type Translations<Language extends string, TranslationKey extends string>
  * @param supportedLanguages List of supported languages
  * @param translations Translation map
  */
-export const helperTranslate = <Language extends string, TranslationKey extends string>(
+export const helperTranslate: <Language extends string, TranslationKey extends string>(
 	baseCode: Language,
 	supportedLanguages: Language[],
 	translations: Translations<Language, TranslationKey>,
-) =>
-(lang: Language) => {
-	const trans = helperGetTranslation(baseCode, supportedLanguages, translations)
-	return (key: TranslationKey, params: Record<string, string> = {}): string => {
-		return trans(lang, key, params)
+) => (lang: Language) => (key: TranslationKey, params?: Record<string, string>) => string =
+	(baseCode, supportedLanguages, translations) => (lang) => {
+		const trans = helperGetTranslation(baseCode, supportedLanguages, translations)
+		return (key, params = {}): string => {
+			return trans(lang, key, params)
+		}
 	}
-}
 
 /**
  * Generic version of `getTranslation`. Do not use it. Use `getTranslation` from your fresh-lang.gen.ts file
@@ -76,24 +76,24 @@ export const helperTranslate = <Language extends string, TranslationKey extends 
  * @param supportedLanguages List of supported languages
  * @param translations Translation map
  */
-export const helperGetTranslation = <Language extends string, TranslationKey extends string>(
+export const helperGetTranslation: <Language extends string, TranslationKey extends string>(
 	baseCode: Language,
 	supportedLanguages: Language[],
 	translations: Translations<Language, TranslationKey>,
-) =>
-(lang: Language, key: TranslationKey, params: Record<string, string> = {}): string => {
-	if (!supportedLanguages.includes(lang)) {
-		lang = baseCode
+) => (lang: Language, key: TranslationKey, params?: Record<string, string>) => string =
+	(baseCode, supportedLanguages, translations) => (lang, key, params = {}): string => {
+		if (!supportedLanguages.includes(lang)) {
+			lang = baseCode
+		}
+
+		const c = translations[lang][key]
+
+		if (typeof c !== "string") {
+			return `{${key}}`
+		}
+
+		return formatString(c, params)
 	}
-
-	const c = translations[lang][key]
-
-	if (typeof c !== "string") {
-		return `{${key}}`
-	}
-
-	return formatString(c, params)
-}
 
 /**
  * Generic version of `useLanguage`. Do not use it. Use `useLanguage` from your fresh-lang.gen.ts file

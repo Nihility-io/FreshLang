@@ -53,7 +53,7 @@ export type Translations<Language extends string, TranslationKey extends string>
 >
 
 /**
- * Generic version of `translate`. Do not use it. Use `translate` from your translations.gen.ts file
+ * Generic version of `translate`. Do not use it. Use `translate` from your fresh-lang.gen.ts file
  * @param baseCode Language code of the base language
  * @param supportedLanguages List of supported languages
  * @param translations Translation map
@@ -63,8 +63,25 @@ export const helperTranslate = <Language extends string, TranslationKey extends 
 	supportedLanguages: Language[],
 	translations: Translations<Language, TranslationKey>,
 ) =>
-(lang: Language) =>
-(key: TranslationKey, params: Record<string, string> = {}): string => {
+(lang: Language) => {
+	const trans = helperGetTranslation(baseCode, supportedLanguages, translations)
+	return (key: TranslationKey, params: Record<string, string> = {}): string => {
+		return trans(lang, key, params)
+	}
+}
+
+/**
+ * Generic version of `getTranslation`. Do not use it. Use `getTranslation` from your fresh-lang.gen.ts file
+ * @param baseCode Language code of the base language
+ * @param supportedLanguages List of supported languages
+ * @param translations Translation map
+ */
+export const helperGetTranslation = <Language extends string, TranslationKey extends string>(
+	baseCode: Language,
+	supportedLanguages: Language[],
+	translations: Translations<Language, TranslationKey>,
+) =>
+(lang: Language, key: TranslationKey, params: Record<string, string> = {}): string => {
 	if (!supportedLanguages.includes(lang)) {
 		lang = baseCode
 	}
@@ -79,7 +96,7 @@ export const helperTranslate = <Language extends string, TranslationKey extends 
 }
 
 /**
- * Generic version of `useLanguage`. Do not use it. Use `useLanguage` from your translations.gen.ts file
+ * Generic version of `useLanguage`. Do not use it. Use `useLanguage` from your fresh-lang.gen.ts file
  * @param initialLanguage Language used until the language cookie is read on the client's side. Optimally set this value using the `state.lang`
  */
 export const helperUseLanguage = <Language extends string>(

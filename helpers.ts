@@ -1,5 +1,7 @@
 import { useCookie } from "@nihility-io/use-cookie"
 
+export type TrimPrefix<TPrefix extends string, T extends string> = T extends `${TPrefix}.${infer R}` ? R : never
+
 /**
  * Compile strings containing variables
  * @param template Template string

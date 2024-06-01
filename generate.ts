@@ -99,13 +99,24 @@ const translations: Record<Language, Record<TranslationKey, string>> = ${JSON.st
 const sTranslate = (m: Record<string, Metadata>, baseLanguage: string): string => `
 /**
  * Create a translation function for a give language
- * @param lang Language code
+ * @param lang Language
  */
 const translate: (lang: Language) => (key: TranslationKey, params?: Record<string, string>) => string = helperTranslate(
 	Language.${m[baseLanguage].EnglishName},
 	[${Record.mapToArray(m, (_k, { EnglishName }) => `Language.${EnglishName}`).join(", ")}],
 	translations,
-)`
+)
+
+/**
+ * Gets the translation in a given language (outside of Preact)
+ * @param lang Language
+ * @param key Translation key
+ * @returns Translated string
+ */
+export const getTranslation = (lang: Language, key: TranslationKey): string => translations[lang][key] ?? translations[Language.${
+	m[baseLanguage].EnglishName
+}][key]
+`
 
 export const generate = (
 	importName: string,

@@ -1,6 +1,6 @@
 {
 	"name": "@nihility-io/fresh-lang",
-	"version": "0.1.11",
+	"version": "0.1.12",
 	"exports": "./mod.ts",
 	"lock": true,
 	"tasks": {

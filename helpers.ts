@@ -1,6 +1,24 @@
 import { useCookie } from "@nihility-io/use-cookie"
+import { Metadata } from "./models.ts"
 
 export type TrimPrefix<TPrefix extends string, T extends string> = T extends `${TPrefix}.${infer R}` ? R : never
+
+let langMetadata: Record<string, Metadata> = {}
+
+/**
+ * Called by fresh-lang.gen.ts in order to the the language metadata, which is used by the Fresh plugin
+ * @param m Metadata
+ */
+export const setLanguageMetadata = (m: Record<string, Metadata>): void => {
+	langMetadata = m
+}
+
+/**
+ * Called by the Fresh plugin in order to get the language metadata
+ */
+export const getLanguageMetadata = (): Record<string, Metadata> => {
+	return langMetadata
+}
 
 /**
  * Compile strings containing variables

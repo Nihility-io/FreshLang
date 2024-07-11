@@ -1,8 +1,7 @@
 import Record from "@nihility-io/record"
 import { generate } from "./generate.ts"
-import { getCookies } from "./helpers.ts"
+import { getCookies, getLanguageMetadata } from "./helpers.ts"
 import { loadFiles } from "./load.ts"
-import { Metadata } from "./models.ts"
 
 export interface Config {
 	source?: string
@@ -28,18 +27,13 @@ interface Plugin {
 }
 
 export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
-	let langMetadata: Record<string, Metadata> = {}
-
-	const isLanguageSupported = (s: string): boolean => Record.keys(langMetadata).includes(s)
-
-	const supportedLanguages: string[] = []
+	const isLanguageSupported = (s: string): boolean => Record.keys(getLanguageMetadata()).includes(s)
 	;(async () => {
 		if (Deno.mainModule.endsWith("dev.ts")) {
 			const [translations, metadata] = await loadFiles(
 				cfg.baseLanguage ?? "en",
 				new URL(meta.resolve(`./${cfg.source ?? "translations"}`)),
 			)
-			supportedLanguages.push(...Object.keys(translations))
 
 			const script = generate(
 				cfg.importName ?? "@nihility-io/fresh-lang",
@@ -49,21 +43,9 @@ export default (meta: ImportMeta, cfg: Config = {}): Plugin => {
 			)
 
 			await Deno.writeTextFile(
-				new URL(meta.resolve("./fresh-lang.gen.json")),
-				JSON.stringify(metadata, null, 2),
-			)
-
-			await Deno.writeTextFile(
 				new URL(meta.resolve("./fresh-lang.gen.ts")),
 				script,
 			)
-		}
-		try {
-			langMetadata = await Deno.readTextFile(
-				new URL(meta.resolve("./fresh-lang.gen.json")),
-			).then(JSON.parse)
-		} catch (e) {
-			console.log(e)
 		}
 	})()
 

@@ -2,6 +2,7 @@
 Basic implementation for multi language support with Fresh.
 
 #### Warning
+*__This project has been abandoned and will not work with Deno Fresh 2.__*
 *__This is probably not a very good implementation for multi language support. It works my my use cases. You are free to use it too, if this implementation works for you as well.__*
 
 ## Usage
